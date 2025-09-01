@@ -37,7 +37,7 @@ SELECT tpv_tool_name, count(tpv_tool_name) as num_jobs, AVG(runtime) as runtime,
   AVG(job_max_mem_gb) as avg_job_max_mem_gb,
   MAX(job_max_mem_gb) as max_job_max_mem_gb,
   AVG(GREATEST(tpv_mem_gb - job_max_mem_gb, 0)) as mem_wastage_avg_gb,
-  MIN(GREATEST(tpv_mem_gb - job_max_mem_gb, 0)) as mem_wastage_min_gb
+  MIN(GREATEST(tpv_mem_gb - job_max_mem_gb, 0)) as mem_wastage_min_gb,
   COALESCE(AVG(GREATEST(tpv_mem_gb - job_max_mem_gb, 0) / NULLIF(tpv_mem_gb, 0) * 100), 0) as mem_wastage_avg_percentage,
   COALESCE(MIN(GREATEST(tpv_mem_gb - job_max_mem_gb, 0) / NULLIF(tpv_mem_gb, 0) * 100), 0) as mem_wastage_min_percentage
 '''
@@ -119,7 +119,7 @@ async def main(database_uris):
 
     # Calculate weighted mem_wastage_min across all rows
     total_jobs = combined_df['num_jobs'].sum()
-    weighted_mem_wastage_min = (combined_df['mem_wastage_min'] * combined_df['num_jobs']).sum() / total_jobs
+    weighted_mem_wastage_min = (combined_df['mem_wastage_min_gb'] * combined_df['num_jobs']).sum() / total_jobs
 
     # Calculate weighted minimum wastage as a percentage using mem_wastage_min_percentage column across all rows
     weighted_mem_wastage_percentage = (combined_df['mem_wastage_min_percentage'] * combined_df['num_jobs']).sum() / total_jobs
